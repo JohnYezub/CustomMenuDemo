@@ -15,7 +15,7 @@ protocol CustomSegmentControlDelegate: class {
 
 final class CustomSegmentControl: UIView {
     
-        
+     ///set index in init to display selected button. If index wrong, all buttons will be deselected
     init(withSelected itemIndex: Int) {
         super.init(frame: .zero)
         self.selectedItemIndex = itemIndex
@@ -27,29 +27,39 @@ final class CustomSegmentControl: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    weak var delegate: CustomSegmentControlDelegate?
+    weak private var delegate: CustomSegmentControlDelegate?
     
+    /// property to notify if the value was changed (i.e. index). Check it in ViewController.
     var passIndex: ((Int)->Void)?
-    private let items = ["First", "Second", "Third", "Fourth"]
+    
+    ///buttons names
+    private let names = ["First", "Second", "Third", "Fourth"]
+    
     private var itemButtons: [UIButton] = []
-    private var selectedItemIndex: Int! {
+    
+    ///observer fot selection
+     var selectedItemIndex: Int! {
         didSet {
+            print("didSet selectedItemIndex")
             selectedItem(at: selectedItemIndex)
             passIndex?(selectedItemIndex)
+            
         }
     }
     // MARK: UI
     private let contentStackView = UIStackView()
-    private let tabSelectionMarkerView = UIView()
+ 
+    
+    // MARK: - Setup the View and buttons
     
     private func configure() {
         backgroundColor = UIColor.lightGray
         
-        itemButtons = items.enumerated().map { index, item in
+        itemButtons = names.enumerated().map { index, item in
             
             let button = UIButton()
             button.snp.makeConstraints { (make) in
-                make.width.equalTo(40)
+                make.width.equalTo(60)
                 make.height.equalTo(40)
             }
             
@@ -63,54 +73,67 @@ final class CustomSegmentControl: UIView {
             button.tag = index
             button.isUserInteractionEnabled = true
             
-            button.addTarget(self, action: #selector(btnClicked(_:)), for: .touchUpInside)
+            button.addTarget(self, action: #selector(btnClicked(_:)), for: .touchDown)
             
             return button
             
         }
-        
-        configureStackView()
-        
+        setupStackView()
     }
+
+    //MARK: - Setup StackView
     
-    private func configureStackView() {
+    private func setupStackView() {
+        ///add the appearence  of StackView
         addSubview(contentStackView)
         contentStackView.snp.makeConstraints { (make) in
             make.centerX.equalToSuperview()
             make.centerY.equalToSuperview()
         }
+        
+        ///configure StackView
         contentStackView.axis = .horizontal
         contentStackView.alignment = .fill
         contentStackView.distribution = .fillEqually
         contentStackView.spacing = 20
         
+        ///add all buttons to Stack View
         itemButtons.forEach { contentStackView.addArrangedSubview($0) }
     }
+    
 //MARK: - Initial item setup
     
     /// set the button to be selected on initial load
     private func setupSelectionView() {
-        guard items.count >= selectedItemIndex else {
+        guard names.count >= selectedItemIndex else {
             print("Index setup error")
             return
         }
+        //we set Green color only if selectedItemIndex < items.count
         itemButtons[selectedItemIndex].backgroundColor = .green
+        
+        print(#function)
     }
     
-    @objc func btnClicked (_ sender:UIButton) {
+    ///once the button is clicked the selectedItemIndex will update with button tag
+    @objc private func btnClicked (_ sender:UIButton) {
         selectedItemIndex = sender.tag
         delegate?.itemSelected(at: selectedItemIndex)
-        print(sender.tag)
+        print("Button index: \(sender.tag)")
     }
     
+    /// select item and reset appearence for other buttons
     private func selectedItem(at index: Int) {
         itemButtons.forEach(resetButtonView)
         let targetButton = itemButtons[index]
-        UIView.animate(withDuration: 0.2) {
+    //    UIView.animate(withDuration: 0.2) {
             targetButton.backgroundColor = .green
-        }
+        print(#function)
+        
+    //    }
     }
     
+    /// set default color for the  sender button
     private func resetButtonView(_ button: UIButton) {
         button.backgroundColor = .cyan
     }
