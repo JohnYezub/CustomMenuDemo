@@ -8,13 +8,28 @@
 
 import UIKit
 
+/// the use of SnapKit helps to use contstraint in easy way
+import SnapKit
+
 class ViewController: UIViewController {
 
+    let customSegmentControl = CustomSegmentControl(withSelected: 0)
+    
     override func viewDidLoad() {
-        super.viewDidLoad()
-        // Do any additional setup after loading the view.
+        super.viewDidLoad()                
     }
 
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        self.view.addSubview(customSegmentControl)
+        customSegmentControl.snp.makeConstraints { (make) in
+            make.leading.equalToSuperview()
+            make.trailing.equalToSuperview()
+            make.bottom.equalToSuperview()
+            make.height.equalTo(100)
+        }
+    }
 
 }
 

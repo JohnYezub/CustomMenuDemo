@@ -9,113 +9,111 @@
 import UIKit
 import SnapKit
 
-protocol ASTabIndicatorViewDelegate: class {
-  func itemSelected(at index: Int)
+protocol CustomSegmentControlDelegate: class {
+    func itemSelected(at index: Int)
 }
 
-final class ASTabIndicatorView: UIView {
-
-  // MARK: Init and deinit
-  init(_ items: [String]) {
-    super.init(frame: .zero)
-    configure(with: items)
-
-  }
-
-  required init?(coder aDecoder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
-  }
-
-  // MARK: Properties
-  weak var delegate: ASTabIndicatorViewDelegate?
-  private var items = [String]()
-  private var itemLabels = [UILabel]()
-  private var selectedItemIndex = 0 {
-    didSet {
-      selectedItem(at: selectedItemIndex)
+final class CustomSegmentControl: UIView {
+    
+        
+    init(withSelected itemIndex: Int) {
+        super.init(frame: .zero)
+        self.selectedItemIndex = itemIndex
+        configure()
+        setupSelectionView()
     }
-  }
-  
-  // MARK: UI
-  private let contentStackView = UIStackView()
-  private let tabSelectionMarkerView = UIView()
-
-  // MARK: Functions
-  private func configure(with items: [String]) {
-    self.items = items
-    itemLabels = items.enumerated().map { idx, item in
-      let label = UILabel()
-      label.text = item
-      label.font = UIFont.systemFont(ofSize: 12)
-      label.textColor = .white
-      label.textAlignment = .center
-      label.backgroundColor = .clear
-      label.isUserInteractionEnabled = true
-      label.tag = idx
-
-      let tapGesture = UITapGestureRecognizer(target: self, action: #selector(itemLabelTap))
-      label.addGestureRecognizer(tapGesture)
-
-      return label
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
-
-    configureStackView()
-    setupSelectionView()
-    backgroundColor = UIColor.darkGray
-    selectedItemIndex = 0
-  }
-
-  private func configureStackView() {
-    addSubview(contentStackView)
-    contentStackView.snp.makeConstraints { (make) in
-      make.edges.equalToSuperview()
+    
+    weak var delegate: CustomSegmentControlDelegate?
+    
+    var passIndex: ((Int)->Void)?
+    private let items = ["First", "Second", "Third", "Fourth"]
+    private var itemButtons: [UIButton] = []
+    private var selectedItemIndex: Int! {
+        didSet {
+            selectedItem(at: selectedItemIndex)
+            passIndex?(selectedItemIndex)
+        }
     }
-    contentStackView.axis = .horizontal
-    contentStackView.distribution = .fillEqually
-    itemLabels.forEach { contentStackView.addArrangedSubview($0) }
-  }
-
-  private func setupSelectionView() {
-    addSubview(tabSelectionMarkerView)
-    tabSelectionMarkerView.snp.makeConstraints { (make) in
-      make.edges.equalTo(itemLabels.first!.snp.edges)
+    // MARK: UI
+    private let contentStackView = UIStackView()
+    private let tabSelectionMarkerView = UIView()
+    
+    private func configure() {
+        backgroundColor = UIColor.lightGray
+        
+        itemButtons = items.enumerated().map { index, item in
+            
+            let button = UIButton()
+            button.snp.makeConstraints { (make) in
+                make.width.equalTo(40)
+                make.height.equalTo(40)
+            }
+            
+            button.titleLabel?.font = UIFont(name: "Helvetica", size: 14)
+            button.setTitle(item, for: .normal)
+            button.setTitleColor(.white, for: .normal)
+            button.setTitleColor(.lightGray, for: .highlighted)
+            button.backgroundColor = .cyan
+            
+            ///set the view to de-selected for all buttons on setup
+            button.tag = index
+            button.isUserInteractionEnabled = true
+            
+            button.addTarget(self, action: #selector(btnClicked(_:)), for: .touchUpInside)
+            
+            return button
+            
+        }
+        
+        configureStackView()
+        
     }
-    sendSubviewToBack(tabSelectionMarkerView)
-    tabSelectionMarkerView.layer.backgroundColor = UIColor(hexString: "189e02").cgColor
-    tabSelectionMarkerView.layer.setAffineTransform(shearTransform(CGAffineTransform(scaleX: 1.1, y: 1), x: 0.5, y: 0))
-  }
-
-  private func shearTransform(_ transform: CGAffineTransform, x: CGFloat, y: CGFloat) -> CGAffineTransform {
-    var transform = transform
-    transform.c = -x
-    transform.b = y
-    return transform
-  }
-
-   @objc private func itemLabelTap(_ tapGesture: UITapGestureRecognizer) {
-    if let view = tapGesture.view {
-      selectedItemIndex = view.tag
-      delegate?.itemSelected(at: selectedItemIndex)
+    
+    private func configureStackView() {
+        addSubview(contentStackView)
+        contentStackView.snp.makeConstraints { (make) in
+            make.centerX.equalToSuperview()
+            make.centerY.equalToSuperview()
+        }
+        contentStackView.axis = .horizontal
+        contentStackView.alignment = .fill
+        contentStackView.distribution = .fillEqually
+        contentStackView.spacing = 20
+        
+        itemButtons.forEach { contentStackView.addArrangedSubview($0) }
     }
-  }
-
-  private func selectedItem(at index: Int) {
-    itemLabels.forEach(resetFontOnLabel)
-    let targetLabel = itemLabels[index]
-    targetLabel.font = UIFont.boldSystemFont(ofSize: 12)
-    UIView.animate(withDuration: 0.2) {
-      self.tabSelectionMarkerView.center = targetLabel.center
+//MARK: - Initial item setup
+    
+    /// set the button to be selected on initial load
+    private func setupSelectionView() {
+        guard items.count >= selectedItemIndex else {
+            print("Index setup error")
+            return
+        }
+        itemButtons[selectedItemIndex].backgroundColor = .green
     }
-  }
-
-  private func resetFontOnLabel(_ label: UILabel) {
-    label.font = UIFont.systemFont(ofSize: 12)
-  }
-
-  public func setItemSelected(_ index: Int) {
-    guard items.count >= index else {
-      return
+    
+    @objc func btnClicked (_ sender:UIButton) {
+        selectedItemIndex = sender.tag
+        delegate?.itemSelected(at: selectedItemIndex)
+        print(sender.tag)
     }
-    selectedItemIndex = index
-  }
+    
+    private func selectedItem(at index: Int) {
+        itemButtons.forEach(resetButtonView)
+        let targetButton = itemButtons[index]
+        UIView.animate(withDuration: 0.2) {
+            targetButton.backgroundColor = .green
+        }
+    }
+    
+    private func resetButtonView(_ button: UIButton) {
+        button.backgroundColor = .cyan
+    }
+    
 }
+
