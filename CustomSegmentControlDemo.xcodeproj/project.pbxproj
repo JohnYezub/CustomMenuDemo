@@ -13,6 +13,7 @@
 		8478C65C24D3EF3C000CF598 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8478C65A24D3EF3C000CF598 /* Main.storyboard */; };
 		8478C65E24D3EF3F000CF598 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8478C65D24D3EF3F000CF598 /* Assets.xcassets */; };
 		8478C66124D3EF3F000CF598 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8478C65F24D3EF3F000CF598 /* LaunchScreen.storyboard */; };
+		8478C66924D3EF5F000CF598 /* CustomSegmentControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8478C66824D3EF5F000CF598 /* CustomSegmentControl.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -24,6 +25,7 @@
 		8478C65D24D3EF3F000CF598 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		8478C66024D3EF3F000CF598 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		8478C66224D3EF3F000CF598 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		8478C66824D3EF5F000CF598 /* CustomSegmentControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomSegmentControl.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -59,6 +61,7 @@
 				8478C65424D3EF3C000CF598 /* AppDelegate.swift */,
 				8478C65624D3EF3C000CF598 /* SceneDelegate.swift */,
 				8478C65824D3EF3C000CF598 /* ViewController.swift */,
+				8478C66824D3EF5F000CF598 /* CustomSegmentControl.swift */,
 				8478C65A24D3EF3C000CF598 /* Main.storyboard */,
 				8478C65D24D3EF3F000CF598 /* Assets.xcassets */,
 				8478C65F24D3EF3F000CF598 /* LaunchScreen.storyboard */,
@@ -138,6 +141,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8478C66924D3EF5F000CF598 /* CustomSegmentControl.swift in Sources */,
 				8478C65924D3EF3C000CF598 /* ViewController.swift in Sources */,
 				8478C65524D3EF3C000CF598 /* AppDelegate.swift in Sources */,
 				8478C65724D3EF3C000CF598 /* SceneDelegate.swift in Sources */,
